@@ -1,24 +1,69 @@
-# time_management_system
+# סדר יום
 
-מערכת לניהול זמן משפחתי בהתקנה עצמית (Umbrel / Portainer): שגרות ומשימות קבועות בשעות, תצוגת יום/שבוע/חודש, חשבונות משתמשים, שיתוף והצלבה בין לוחות.
+לוח זמנים משפחתי בהתקנה עצמית, שרץ כקונטיינר אחד על Umbrel (או על כל שרת Docker).
 
-- תוכנית המערכת: [docs/PLAN.md](docs/PLAN.md)
-- מוקאפ דינמי: https://claude.ai/artifact/GpY2yLWCvLwprHBdYAn29o
+- שגרות ומשימות שקורות קבוע בשעות קבועות, עם קטגוריות נפרדות לכל סוג.
+- תצוגת יום, שבוע וחודש.
+- חשבון לכל אחד מבני הבית, שיתוף ברמות (תפוס בלבד / צפייה / עריכה) ושיבוצים פרטיים.
+- לוח משולב עם מסלול לכל משתמש, והצלבה: התנגשויות, זמן פנוי משותף וחלוקת מטלות הבית.
+- עדכון חי בין מכשירים, גיבוי יומי אוטומטי, וניתן להוספה למסך הבית של הטלפון.
 
-## מצב הפרויקט
+תוכנית המערכת: [docs/PLAN.md](docs/PLAN.md) · מוקאפ מקורי: https://claude.ai/artifact/GpY2yLWCvLwprHBdYAn29o
 
-שלב 0 מתוך התוכנית: שלד שרץ כקונטיינר אחד ומציג עמוד מצב. ההתחברות והלוח עצמו עדיין לא קיימים.
+## התקנה
 
-## מבנה
+האימג' מתפרסם ל-`ghcr.io/tcbr10/time_management_system` עבור amd64 ו-arm64, בכל דחיפה ל-`main`.
 
-```
-server/   שרת ה-API (Node 22, Fastify, SQLite דרך Drizzle)
-web/      הלקוח (React, Vite), נבנה לקבצים סטטיים שהשרת מגיש
-deploy/   קובצי פריסה (Portainer)
-docs/     תוכנית המערכת
-```
+חבילה חדשה ב-GHCR נוצרת כפרטית. כדי ש-Umbrel יוכל למשוך אותה בלי הזדהות, הופכים אותה לציבורית בהגדרות החבילה ב-GitHub (Package settings ← Change visibility). לחלופין מוסיפים ב-Portainer את `ghcr.io` כ-Registry עם Personal Access Token בעל הרשאת `read:packages`.
 
-## פיתוח מקומי
+### אפשרות א׳: Portainer על Umbrel
+
+1. ב-Portainer: Stacks ← Add stack.
+2. מדביקים את [deploy/portainer/docker-compose.yml](deploy/portainer/docker-compose.yml) ולוחצים Deploy.
+3. פותחים `http://<כתובת-ה-Umbrel>:8420`.
+
+הנתונים נשמרים ב-named volume בשם `seder-data`. לא להחליף אותו ב-bind mount: לפי Umbrel, מידע ב-bind mount אובד כש-Portainer מתעדכן או מופעל מחדש.
+
+### אפשרות ב׳: Umbrel Community App Store
+
+הריפו הזה משמש גם כחנות אפליקציות קהילתית של Umbrel (הקבצים `umbrel-app-store.yml` ו-`tcbr-seder-yom/`).
+
+1. ב-umbrelOS: App Store ← תפריט שלוש הנקודות ← Community App Stores.
+2. מוסיפים את הכתובת `https://github.com/tcbr10/time_management_system`.
+3. מתקינים את "סדר יום" מהחנות שנוספה.
+
+זה דורש שהריפו והאימג' יהיו ציבוריים. האריזה הזו נכתבה לפי התבנית של Umbrel אך עדיין לא נוסתה על מכשיר Umbrel אמיתי; אפשרות א׳ נבדקה מקומית עם Docker.
+
+## שימוש ראשון
+
+1. בכניסה הראשונה יוצרים את חשבון המנהל. באותו רגע נוצרות קטגוריות ברירת המחדל.
+2. בהגדרות ← "בני הבית" יוצרים קישור הזמנה ושולחים אותו לבן/בת הזוג. הקישור חד־פעמי ותקף לשבוע.
+3. אחרי ההצטרפות כל אחד רואה את הלוח של השני ברמת "צפייה". כדי לשבץ שיבוץ משותף ("של שנינו"), כל צד צריך לתת לשני הרשאת "צפייה ועריכה" בהגדרות ← "שיתוף".
+4. שיבוץ חדש: כפתור "שיבוץ חדש", או לחיצה על שעה ריקה בלוח.
+
+## גיבוי ושחזור
+
+- פעם ביום נשמר עותק של מסד הנתונים ב-`/data/backups` (בתוך ה-volume), ונשמרים 14 האחרונים.
+- בהגדרות ← "גיבוי" (למנהל) אפשר ליצור גיבוי מיידי ולהוריד את כל הנתונים כקובץ JSON.
+- שחזור: עוצרים את הקונטיינר, מעתיקים קובץ גיבוי על `/data/app.db`, מוחקים את `app.db-wal` ו-`app.db-shm` אם קיימים, ומפעילים מחדש.
+
+הגיבויים נמצאים על אותו דיסק כמו הנתונים, ולכן הם לא מגינים מפני תקלה בדיסק. כדאי להעתיק מדי פעם עותק אל מחוץ לשרת.
+
+## גישה מהטלפון ומחוץ לבית
+
+- ברשת הביתית נכנסים לכתובת של ה-Umbrel בפורט 8420, ואפשר להוסיף את הדף למסך הבית.
+- מחוץ לבית: דרך Tailscale (קיים כאפליקציה ב-Umbrel). אין צורך לחשוף את השרת לאינטרנט, ולא מומלץ.
+- מצב לא מקוון (service worker) פועל רק בחיבור HTTPS, כלומר דרך Tailscale עם תעודה. ב-HTTP רגיל האפליקציה פשוט עובדת כשיש חיבור לשרת.
+
+## משתני סביבה
+
+| משתנה | ברירת מחדל | משמעות |
+|---|---|---|
+| `TZ` | UTC | אזור הזמן של הבית, למשל `Asia/Jerusalem`. קובע מתי מתחלף היום לצורך הגיבוי היומי |
+| `PORT` | `3000` | הפורט שהשרת מאזין עליו בתוך הקונטיינר |
+| `DATA_DIR` | `/data` | תיקיית הנתונים |
+
+## פיתוח
 
 נדרש Node 22 ומעלה.
 
@@ -32,8 +77,6 @@ npm run dev
 
 הלקוח עולה על http://localhost:5173 ומפנה קריאות `/api` לשרת שעל פורט 3000. הנתונים נשמרים בתיקיית `data/` בשורש הריפו.
 
-בדיקות, בדיקת טיפוסים ובנייה:
-
 ```bash
 npm test
 ```
@@ -46,13 +89,13 @@ npm run typecheck
 npm run build
 ```
 
-אחרי שינוי ב-`server/src/db/schema.ts` יוצרים קובץ מיגרציה:
+אחרי שינוי ב-`server/src/db/schema.ts` יוצרים קובץ מיגרציה, והוא מוחל אוטומטית בעליית השרת:
 
 ```bash
 npm run db:generate --workspace @tms/server
 ```
 
-## הרצה ב-Docker
+בניית האימג' מקומית:
 
 ```bash
 docker build -t seder-yom .
@@ -62,20 +105,20 @@ docker build -t seder-yom .
 docker run --rm -p 8420:3000 -e TZ=Asia/Jerusalem -v seder-data:/data seder-yom
 ```
 
-העמוד זמין ב-http://localhost:8420, ובדיקת הבריאות ב-`/api/health`.
+### מבנה
 
-משתני סביבה:
+```
+server/src/engine/   חזרתיות, הרשאות והצלבה – קוד טהור עם בדיקות יחידה
+server/src/routes/   נקודות הקצה של ה-API
+server/src/db/       סכמה (Drizzle) ופתיחת מסד הנתונים
+server/src/shared/   טיפוסים משותפים לשרת וללקוח
+server/drizzle/      קובצי מיגרציה
+web/src/calendar/    הלוח: יום, שבוע, חודש, טופס וחלונית פרטים
+web/src/settings/    מסך ההגדרות
+deploy/portainer/    קובץ Stack ל-Portainer
+tcbr-seder-yom/      אריזה ל-Umbrel Community App Store
+```
 
-| משתנה | ברירת מחדל | משמעות |
-|---|---|---|
-| `PORT` | `3000` | הפורט שהשרת מאזין עליו בתוך הקונטיינר |
-| `DATA_DIR` | `/data` | תיקיית הנתונים (קובץ ה-SQLite) |
-| `TZ` | UTC | אזור הזמן של הלוח, למשל `Asia/Jerusalem` |
+### הוצאת גרסה
 
-## פריסה ב-Portainer (Umbrel)
-
-1. ה-CI מפרסם אימג' ל-`ghcr.io/tcbr10/time_management_system` בכל דחיפה ל-`main` ובכל תגית `v*`, עבור amd64 ו-arm64.
-2. ב-Portainer: Stacks ← Add stack, מדביקים את [deploy/portainer/docker-compose.yml](deploy/portainer/docker-compose.yml) ולוחצים Deploy.
-3. פותחים `http://<כתובת-ה-Umbrel>:8420`.
-
-אם המשיכה של האימג' נכשלת בהרשאה: חבילה חדשה ב-GHCR נוצרת כפרטית. אפשר להפוך אותה לציבורית בהגדרות החבילה ב-GitHub, או להוסיף ב-Portainer את `ghcr.io` כ-Registry עם Personal Access Token בעל הרשאת `read:packages`.
+מעדכנים את `version` בשלושת קובצי `package.json`, ב-`tcbr-seder-yom/umbrel-app.yml` ובתגית האימג' שבשני קובצי ה-compose. אחרי מיזוג ל-`main` ה-CI מפרסם את האימג' בתגית הגרסה וב-`latest`.

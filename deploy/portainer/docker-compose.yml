@@ -2,7 +2,7 @@
 # Then open http://<umbrel-address>:8420
 services:
   seder-yom:
-    image: ghcr.io/tcbr10/time_management_system:latest
+    image: ghcr.io/tcbr10/time_management_system:1.0.0
     restart: unless-stopped
     ports:
       - "8420:3000"

@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import {
   api,
   type CalendarDto,
@@ -40,4 +41,32 @@ export function useRefreshAll(): () => void {
       void client.invalidateQueries({ queryKey: [key] });
     }
   };
+}
+
+/**
+ * Listens to the server's change stream and refetches when anyone in the household changes
+ * something. EventSource reconnects by itself; a refetch on reconnect covers what was missed.
+ */
+export function useLiveUpdates(enabled: boolean): void {
+  const refresh = useRefreshAll();
+  useEffect(() => {
+    if (!enabled || typeof EventSource === 'undefined') return;
+    const source = new EventSource('/api/stream');
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = setTimeout(refresh, 150);
+    };
+    let opened = false;
+    source.addEventListener('change', schedule);
+    source.addEventListener('open', () => {
+      if (opened) schedule();
+      opened = true;
+    });
+    return () => {
+      clearTimeout(timer);
+      source.close();
+    };
+    // `refresh` is recreated every render but always does the same thing, so it is not a dependency.
+  }, [enabled]);
 }

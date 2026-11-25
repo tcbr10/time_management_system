@@ -5,6 +5,7 @@ import {
   APP_NAME,
   COLOR_KEYS,
   errorMessage,
+  type BackupDto,
   type CategoryDto,
   type ColorKey,
   type HouseholdSettingsDto,
@@ -245,6 +246,41 @@ function ActiveHoursSection({ settings }: { settings: HouseholdSettingsDto }) {
   );
 }
 
+function BackupSection() {
+  const client = useQueryClient();
+  const backups = useQuery({ queryKey: ['backups'], queryFn: () => api.get<BackupDto[]>('/api/admin/backups') });
+  const run = useMutation({
+    mutationFn: () => api.post<BackupDto>('/api/admin/backups'),
+    onSuccess: () => client.invalidateQueries({ queryKey: ['backups'] }),
+  });
+  const list = backups.data ?? [];
+  return (
+    <Section title="גיבוי" intro="עותק של מסד הנתונים נשמר אוטומטית פעם ביום בתיקיית הנתונים של הקונטיינר, ונשמרים 14 הימים האחרונים. כדאי להעתיק מדי פעם גם עותק אל מחוץ לשרת.">
+      <div className="inline-form">
+        <button type="button" className="button" disabled={run.isPending} onClick={() => run.mutate()}>
+          גיבוי עכשיו
+        </button>
+        <a className="button" href="/api/admin/export" download>
+          הורדת כל הנתונים (JSON)
+        </a>
+      </div>
+      <ErrorNote message={run.error ? errorMessage(run.error) : null} />
+      {list.length === 0 ? (
+        <p className="muted">עדיין אין גיבויים.</p>
+      ) : (
+        <ul className="plain-list backup-list">
+          {list.map((backup) => (
+            <li key={backup.name}>
+              <span dir="ltr">{backup.name}</span>
+              <span className="muted">{Math.max(1, Math.round(backup.size / 1024))} KB</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Section>
+  );
+}
+
 function AccountSection() {
   const client = useQueryClient();
   const [current, setCurrent] = useState('');
@@ -315,6 +351,7 @@ export function SettingsPage({ me }: { me: UserDto }) {
         <SharingSection me={me} users={users} />
         {isAdmin && <MembersSection me={me} users={users} />}
         {isAdmin && household && <ActiveHoursSection settings={household} />}
+        {isAdmin && <BackupSection />}
         <AccountSection />
       </main>
     </div>

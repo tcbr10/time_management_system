@@ -8,17 +8,22 @@ import * as schema from './schema.js';
 
 export interface AppDatabase {
   db: ReturnType<typeof drizzle<typeof schema>>;
+  /** Path of the SQLite file. */
+  file: string;
   /** True when a trivial query succeeds. */
   ping(): boolean;
   /** ISO timestamp of the first start against this data directory. */
   installedAt: string;
+  /** Writes a consistent copy of the live database to `file`. */
+  backup(file: string): Promise<void>;
   close(): void;
 }
 
 /** Opens (creating if needed) the SQLite file in `dataDir` and applies pending migrations. */
 export function openDatabase(dataDir: string, migrationsDir: string): AppDatabase {
   mkdirSync(dataDir, { recursive: true });
-  const sqlite = new Database(path.join(dataDir, 'app.db'));
+  const file = path.join(dataDir, 'app.db');
+  const sqlite = new Database(file);
   sqlite.pragma('journal_mode = WAL');
   sqlite.pragma('foreign_keys = ON');
 
@@ -37,6 +42,7 @@ export function openDatabase(dataDir: string, migrationsDir: string): AppDatabas
 
   return {
     db,
+    file,
     installedAt: installed!.value,
     ping() {
       try {
@@ -45,6 +51,9 @@ export function openDatabase(dataDir: string, migrationsDir: string): AppDatabas
       } catch {
         return false;
       }
+    },
+    async backup(file) {
+      await sqlite.backup(file);
     },
     close() {
       sqlite.close();

@@ -1311,6 +1311,14 @@ ul {
   flex: 1 1 220px;
 }
 
+.backup-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
 /* ---------- Narrow screens ---------- */
 
 @media (max-width: 900px) {

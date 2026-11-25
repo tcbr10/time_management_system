@@ -1,0 +1,30 @@
+manifestVersion: 1
+id: tcbr-seder-yom
+category: files
+name: סדר יום
+version: "1.0.0"
+tagline: לוח זמנים משפחתי – שגרות, משימות והצלבה בין לוחות
+description: >-
+  סדר יום הוא לוח זמנים ביתי בהתקנה עצמית. משבצים בו שגרות ומשימות שקורות קבוע בשעות קבועות,
+  רואים אותן בתצוגת יום, שבוע או חודש, ומשתפים את הלוח עם שאר בני הבית.
+
+
+  לכל אחד מבני הבית חשבון משלו. בלוח המשולב רואים את הזמנים של כולם זה לצד זה, יחד עם
+  התנגשויות, חלונות זמן שבהם כולם פנויים וחלוקת מטלות הבית.
+
+
+  בכניסה הראשונה יוצרים את חשבון המנהל; שאר בני הבית מצטרפים דרך קישור הזמנה מתוך ההגדרות.
+developer: tcbr10
+website: https://github.com/tcbr10/time_management_system
+dependencies: []
+repo: https://github.com/tcbr10/time_management_system
+support: https://github.com/tcbr10/time_management_system/issues
+port: 8420
+icon: https://raw.githubusercontent.com/tcbr10/time_management_system/main/web/public/icon-512.png
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+releaseNotes: ""
+submitter: tcbr10
+submission: https://github.com/tcbr10/time_management_system

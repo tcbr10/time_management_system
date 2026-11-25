@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { UNAUTHORIZED_EVENT } from './api.ts';
 import { JoinScreen, LoginScreen, SetupScreen } from './auth/AuthScreens.tsx';
 import { CalendarPage } from './calendar/CalendarPage.tsx';
-import { useSession } from './queries.ts';
+import { useLiveUpdates, useSession } from './queries.ts';
 import { useLocation } from './router.ts';
 import { SettingsPage } from './settings/SettingsPage.tsx';
 
@@ -17,6 +17,8 @@ export function App() {
     window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
     return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
   }, [client]);
+
+  useLiveUpdates(!!session.data?.user);
 
   if (session.isPending) return <p className="splash">טוען…</p>;
   if (session.isError) {

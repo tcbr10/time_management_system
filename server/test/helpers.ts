@@ -32,6 +32,11 @@ export async function createTestApp(): Promise<TestApp> {
 export class Client {
   private cookie = '';
 
+  /** The session cookie, for requests made outside `inject`. */
+  get cookieHeader(): string {
+    return this.cookie;
+  }
+
   constructor(private readonly app: FastifyInstance) {}
 
   async request<T = unknown>(method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE', url: string, body?: unknown) {

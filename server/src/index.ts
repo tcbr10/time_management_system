@@ -4,7 +4,7 @@ import { openDatabase } from './db/client.js';
 
 const config = loadConfig();
 const database = openDatabase(config.dataDir, config.migrationsDir);
-const app = await buildApp({ config, database });
+const app = await buildApp({ config, database, maintenance: true });
 
 let closing = false;
 async function shutdown(signal: string): Promise<void> {

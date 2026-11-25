@@ -1,0 +1,4 @@
+# Makes this repository usable as an Umbrel Community App Store.
+# In umbrelOS: App Store -> ... -> Community App Stores -> add this repository's URL.
+id: "tcbr"
+name: "TCBR"

@@ -23,3 +23,9 @@ createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+// Offline shell for the installed app. Service workers need a secure context, so over plain
+// HTTP on the home network this is skipped and the app simply works online.
+if (import.meta.env.PROD && 'serviceWorker' in navigator && window.isSecureContext) {
+  window.addEventListener('load', () => void navigator.serviceWorker.register('/sw.js'));
+}
