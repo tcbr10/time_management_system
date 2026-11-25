@@ -1,0 +1,123 @@
+@import '@fontsource-variable/heebo';
+@import '@fontsource-variable/rubik';
+
+:root {
+  --ground: #f3f5f4;
+  --surface: #ffffff;
+  --ink: #17212b;
+  --ink-muted: #55616e;
+  --line: #e1e6ea;
+  --accent: #1d2b4f;
+  --ok-bg: #eaf7f0;
+  --ok-fg: #0e5239;
+  --error-bg: #fff4f2;
+  --error-fg: #7a1a10;
+  --font-body: 'Heebo Variable', 'Arial Hebrew', Arial, sans-serif;
+  --font-display: 'Rubik Variable', var(--font-body);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--accent);
+}
+
+.brand h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.banner {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.banner--ok {
+  background: var(--ok-bg);
+  color: var(--ok-fg);
+}
+
+.banner--error {
+  background: var(--error-bg);
+  color: var(--error-fg);
+}
+
+.banner--neutral {
+  background: var(--ground);
+  color: var(--ink-muted);
+}
+
+.details {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.details__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.details__row:last-child {
+  border-bottom: 0;
+}
+
+.details dt {
+  color: var(--ink-muted);
+}
+
+.details dd {
+  margin: 0;
+  font-weight: 500;
+  text-align: end;
+}
+
+.note {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 14px;
+}

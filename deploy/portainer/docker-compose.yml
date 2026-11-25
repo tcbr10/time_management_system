@@ -1,0 +1,15 @@
+# Portainer: Stacks -> Add stack -> paste this file -> Deploy.
+# Then open http://<umbrel-address>:8420
+services:
+  seder-yom:
+    image: ghcr.io/tcbr10/time_management_system:latest
+    restart: unless-stopped
+    ports:
+      - "8420:3000"
+    environment:
+      TZ: Asia/Jerusalem
+    volumes:
+      - seder-data:/data
+
+volumes:
+  seder-data:
